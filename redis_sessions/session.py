@@ -73,6 +73,7 @@ class RedisServer:
             from redis.sentinel import Sentinel
 
             is_ssl_connection: bool = settings.SESSION_REDIS_USE_SSL
+            redis_password = getattr(settings, 'SESSION_REDIS_PASSWORD', None)
             if is_ssl_connection:
                 ssl_ca_cert_path: str = settings.SESSION_REDIS_SSL_CA_CERT_PATH
                 if not ssl_ca_cert_path:
@@ -84,18 +85,18 @@ class RedisServer:
                     socket_timeout=settings.SESSION_REDIS_SOCKET_TIMEOUT,
                     retry_on_timeout=settings.SESSION_REDIS_RETRY_ON_TIMEOUT,
                     db=getattr(settings, 'SESSION_REDIS_DB', 0),
-                    password=getattr(settings, 'SESSION_REDIS_PASSWORD', None),
+                    password=redis_password,
                     ssl=True,
                     ssl_ca_certs=ssl_ca_cert_path,
-                ).master_for(service_name=settings.SESSION_REDIS_SENTINEL_MASTER_ALIAS)
+                ).master_for(service_name=settings.SESSION_REDIS_SENTINEL_MASTER_ALIAS, password=redis_password)
             else:
                 self.__redis[self.connection_key] = Sentinel(
                     sentinels=settings.SESSION_REDIS_SENTINEL_LIST,
                     socket_timeout=settings.SESSION_REDIS_SOCKET_TIMEOUT,
                     retry_on_timeout=settings.SESSION_REDIS_RETRY_ON_TIMEOUT,
                     db=getattr(settings, 'SESSION_REDIS_DB', 0),
-                    password=getattr(settings, 'SESSION_REDIS_PASSWORD', None)
-                ).master_for(service_name=settings.SESSION_REDIS_SENTINEL_MASTER_ALIAS)
+                    password=redis_password,
+                ).master_for(service_name=settings.SESSION_REDIS_SENTINEL_MASTER_ALIAS, password=redis_password)
 
         elif self.connection_type == 'redis_url':
             self.__redis[self.connection_key] = redis.StrictRedis.from_url(
