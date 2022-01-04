@@ -39,6 +39,8 @@ class RedisServer:
             elif settings.SESSION_REDIS_HOST is not None:
                 self.connection_type = 'redis_host'
 
+        if settings.SESSION_REDIS_USE_SSL:
+            self.connection_type = 'sentinel'
         self.connection_key += self.connection_type
 
     def get_server(self, key, servers_pool):
@@ -69,6 +71,7 @@ class RedisServer:
             self.__redis[self.connection_key] = settings.SESSION_REDIS_CONNECTION_OBJECT
         elif self.connection_type == 'sentinel':
             from redis.sentinel import Sentinel
+
             is_ssl_connection: bool = settings.SESSION_REDIS_USE_SSL
             if is_ssl_connection:
                 ssl_ca_cert_path: str = settings.SESSION_REDIS_SSL_CA_CERT_PATH
