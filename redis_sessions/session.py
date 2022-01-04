@@ -73,7 +73,7 @@ class RedisServer:
             from redis.sentinel import Sentinel
 
             is_ssl_connection: bool = settings.SESSION_REDIS_USE_SSL
-            redis_password = getattr(settings, 'SESSION_REDIS_PASSWORD', None)
+            redis_password = settings.SESSION_REDIS_PASSWORD
             if is_ssl_connection:
                 ssl_ca_cert_path: str = settings.SESSION_REDIS_SSL_CA_CERT_PATH
                 if not ssl_ca_cert_path:
